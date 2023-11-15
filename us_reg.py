@@ -1,38 +1,36 @@
 def val_user(fun):
 
-        def wrap1(name):
-            if  len(name)>=5 and len(name)<=20 and name.isalnum() and\
-                name.lower() not in {"admin","root","user"}:
-                return fun(name)
+        def wrap1(*args):
+            if  len(args[0])>=5 and len(args[0])<=20 and args[0].isalnum() and\
+                args[0].lower() not in {"admin","root","user"}:
+                return fun(*args)
             else:
-                print("Invalid Name! Enter Again(6-19 Character and can't this name(admin,root,user))")
-                return
+                raise ValueError("Invalid Name! Enter Again(6-19 Character and can't this name(admin,root,user))")
+
 
         return wrap1
 def val_mail(fun1):
-    def wrap2(mail):
-        if "@" in mail[1:] and "." in mail[-4:]:
-            return fun1(mail)
+    def wrap2(*args):
+        if "@" in args[1][1:] and "." in args[1][-4:]:
+            return fun1(*args)
         else:
-            print("Invalid Mail")
-            return
+            raise ValueError("Invalid Mail")
     return wrap2
 
 def val_phone(fun2):
-    def wrap2(phone):
-        if (phone[0] == "0" and len(phone)==9 and phone.isdigit()) or (phone[0:4]=="+374" and len(phone)==12 and phone[5:].isdigit()):
-            return(fun2(phone))
+    def wrap2(*args):
+        if (args[2][0] == "0" and len(args[2])==9 and args[2].isdigit()) or (args[2][0:4]=="+374" and len(args[2])==12 and args[2][5:].isdigit()):
+            return(fun2(*args))
         else:
-            print("Invalid phone")
-            return
+            raise ValueError("Invalid phone")
     return wrap2
 def val_password(fun3):
-    def wrap3(password):
+    def wrap3(*args):
         flag1=False
         flag2=False
         flag3=False
-        if (len(password)>=8):
-            for i in password:
+        if (len(args[3])>=8):
+            for i in args[3]:
                 if ("a"<=i<="z"):
                     flag1=True
                 if("A"<=i<="Z"):
@@ -40,60 +38,42 @@ def val_password(fun3):
                 if ("0"<=i<="9"):
                     flag3=True
                 if flag1 and flag2 and flag3:
-                    return fun3(password)
+                    return fun3(*args)
 
-            print("Invalid Password")
+            raise ValueError("Invalid Password")
         else:
-            print("Invalid Password")
-            return
+            raise ValueError("Invalid Password")
+
     return wrap3
 def rep_password(fun4):
-    def wrap4(password,rep_password):
-        if rep_password==password:
+    def wrap4(*args):
+        if args[3]==args[4]:
 
-            return fun4(password,rep_password)
+            return fun4(*args)
         else:
-            print("Repeat Password Error")
-            return
+            raise ValueError("Repeat Password Error")
+
     return wrap4
 
-@val_user
-def username1(username):
-    return username
-@val_mail
-def mail1(mail):
-    return mail
-@val_phone
-def phone1(phone):
-    return phone
-@val_password
-def password1(password):
-    return password
 @rep_password
-def rep_password1(password,repeat_password):
-    return password == repeat_password
+@val_password
+@val_phone
+@val_mail
+@val_user
+def username1(username,email,phone,password,rep_password):
+    return (username,email,phone,password,rep_password)
 while True:
         a=input("Enter '/' to Exit: Enter to Continue")
         if a=="/":
             break
         username = input("Enter Username")
-        if(username1(username)):
-            mail = input("Enter Mail ")
-            if(mail1(mail)):
-                phone = input("Enter Phone-Number ...")
-                if(phone1(phone)):
-                    password = input("Enter password ")
-                    if(password1(password)):
-                        rep_password = input("Repeat password ")
-                        if(rep_password1(password, rep_password)):
-                            print("You Registered")
-                        else:
-                            break
-                    else:
-                        break
-                else:
-                    break
-            else:
-                break
-        else:
+        mail = input("Enter Mail ")
+        phone = input("Enter Phone-Number ...")
+        password = input("Enter password ")
+        rep_password = input("Repeat password ")
+        try:
+            username1(username,mail,phone,password,rep_password)
+            print("Success")
             break
+        except ValueError as e:
+            print(e)
